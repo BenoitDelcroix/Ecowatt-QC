@@ -1,2 +1,2 @@
-# Ecowatt_QC
+# Ecowatt-QC
 Ecowatt made in QC
