@@ -41,3 +41,22 @@ Ecowatt made in QC
     - Past: see folder Data  
     - Current: https://www.hydroquebec.com/data/documents-donnees/donnees-ouvertes/json/production.json  
 - Hydro-Québec production capacity (source: https://www.hydroquebec.com/production/centrales.html)  
+
+## Methods  
+### Basic method to assess grid stress  
+
+### Method to forecast next 24-hour electricity demand  
+- ML model: gradient-boosted decision trees  
+- X data:  
+    - Weather: for each of the 6 cities (Montréal, Québec, Gatineau, Sherbrooke, 
+    Saguenay and Trois-rivières), 6 inputs: min, mean and max of the last and 
+    next 24 hours (36 inputs)   
+    - Population (1 input)  
+    - Past 24-hour electricity demand (24 * 4 = 96 inputs)  
+    - Total number of inputs: 36 + 1 + 96 = 133  
+- Y data:  
+    - Future 24-hour electricity demand (24 * 4 = 96 outputs)  
+    - Total number of outputs: 96
+### Method for deployment  
+- User interface through a streamlit app  
+- API through FastAPI and Deta  
