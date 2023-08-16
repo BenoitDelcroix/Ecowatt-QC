@@ -44,6 +44,13 @@ Ecowatt made in QC
 
 ## Methods  
 ### Basic method to assess grid stress  
+- First indicator:  
+    - Demand > 95% of production capacity --> Red light  
+    - Demand > 80% of production capacity --> Orange light  
+    - Demand <= 80% of production capacity --> Green light  
+- Second indicator:  
+    - If production from thermal plants > 0 --> Red light  
+    - If production from thermal plants = 0 --> Green light  
 
 ### Method to forecast next 24-hour electricity demand  
 - ML model: gradient-boosted decision trees  
