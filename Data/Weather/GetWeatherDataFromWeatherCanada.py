@@ -15,9 +15,6 @@ for year in `seq 1998 2008`;
         stationID=1706&Year=${year}&Month=${month}&Day=14&timeframe=1&submit= Download+Data"
         ;done;done
 
-
-
-
 @author: delcr
 """
 ###############################################################################
@@ -25,7 +22,6 @@ for year in `seq 1998 2008`;
 ###############################################################################
 import os
 import pandas as pd
-import sys
 from tqdm import tqdm
 
 ###############################################################################
