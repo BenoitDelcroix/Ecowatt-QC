@@ -73,4 +73,6 @@ if __name__ == "__main__":
                               columns=['Values'])
     today = date.today()
     df_summary.to_csv(str(today)+'_SummaryPopStat')
+    df['Date'] = df['Year'].astype(int).astype(str)+'-07-15'
+    df.to_csv(str(today)+'_PopStatAllYears')
     
