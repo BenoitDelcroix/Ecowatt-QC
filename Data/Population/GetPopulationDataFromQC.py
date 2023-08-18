@@ -13,8 +13,8 @@ Source: https://statistique.quebec.ca/fr/produit/tableau/estimation-de-la-popula
 ###############################################################################
 import os
 import pandas as pd
-import sys
 import numpy as np
+from datetime import date
 
 ###############################################################################
 # FONCTIONS
@@ -64,4 +64,13 @@ if __name__ == "__main__":
     df_grow['MeanAnnualPerc'] = df_grow['AbsoluteDifference']/\
         df_grow['Init_Pop']*100/df_grow['NumberYears']
     MeanAnnualGrowingRate = df_grow['MeanAnnualPerc'].mean()
+    
+    # Generate summary table to save as csv
+    ListIndex = ['LastYear','LastYearPopulation','MeanAnnualGrowingRate_%']
+    ListValues = [df['Year'].values[-1], df['Population'].values[-1],
+                  MeanAnnualGrowingRate]
+    df_summary = pd.DataFrame(data=ListValues,index=ListIndex,
+                              columns=['Values'])
+    today = date.today()
+    df_summary.to_csv(str(today)+'_SummaryPopStat')
     

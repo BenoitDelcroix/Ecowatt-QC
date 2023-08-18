@@ -15,7 +15,7 @@ import pandas as pd
 from urllib import request
 import ssl
 from bs4 import BeautifulSoup
-import sys
+from datetime import date
 
 ###############################################################################
 # FONCTIONS
@@ -71,6 +71,10 @@ if __name__ == "__main__":
     df3['Puissance_MW'] = pd.to_numeric(df3['Puissance_MW'])
     Tot_Autres = df3['Puissance_MW'].values[0]
     
-    
-    
+    # Generate summary table to be saved in csv
+    ListIndex = ['HydroHQ_MW','TGV_HQ_MW','ReseauIsolesHQ_MW','Autres_MW']
+    ListValues = [Tot_HQ,Tot_TGV,Tot_ReseauIsole,Tot_Autres]    
+    df = pd.DataFrame(data=ListValues,index=ListIndex,columns=['Capacity_MW'])
+    today = date.today()
+    df.to_csv(str(today)+'_HQcapacity.csv')    
     
