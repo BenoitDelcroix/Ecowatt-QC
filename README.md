@@ -12,7 +12,7 @@ Ecowatt made in QC
         - Past: see folder Data  
         - Last 24 hours: https://weather.gc.ca/past_conditions/index_e.html?station=yqb    
         - Current: https://weather.gc.ca/city/pages/qc-133_metric_e.html  
-        - Forecast: https://weather.gc.ca/forecast/hourly/qc-133_metric_e.htmlg      
+        - Forecast: https://weather.gc.ca/forecast/hourly/qc-133_metric_e.html      
     - Gatineau:  
         - Past: see folder Data  
         - Last 24 hours: https://weather.gc.ca/past_conditions/index_e.html?station=ynd    
@@ -44,13 +44,10 @@ Ecowatt made in QC
 
 ## Methods  
 ### Basic method to assess grid stress  
-- First indicator:  
-    - Demand > 95% of production capacity --> Red light  
-    - Demand > 80% of production capacity --> Orange light  
-    - Demand <= 80% of production capacity --> Green light  
-- Second indicator:  
-    - If production from thermal plants > 0 --> Red light  
-    - If production from thermal plants = 0 --> Green light  
+- Indicator:  
+    - Demand estimated by the model forecasting the 95th percentile > HQ production capacity --> Red light  
+    - Demand estimated by the model forecasting the 99th percentile > HQ production capacity --> Orange light  
+    - Otherwise --> Green light  
 
 ### Method to forecast next 24-hour electricity demand  
 - ML model: gradient-boosted decision trees  
@@ -58,12 +55,13 @@ Ecowatt made in QC
     - Weather: for each of the 6 cities (Montréal, Québec, Gatineau, Sherbrooke, 
     Saguenay and Trois-rivières), 6 inputs: min, mean and max of the last and 
     next 24 hours (36 inputs)   
-    - Population (1 input)  
-    - Past 24-hour electricity demand (24 * 4 = 96 inputs)  
-    - Total number of inputs: 36 + 1 + 96 = 133  
+    - Beginning hour number of the forecast (1 input)  
+    - Beginning number of day of the forecast (1 input)  
+    - Working days (previous, current and next day - 3 inputs)  
+    - Total number of inputs: 36 + 1 + 1 + 3 = 41 inputs  
 - Y data:  
-    - Future 24-hour electricity demand (24 * 4 = 96 outputs)  
-    - Total number of outputs: 96
+    - Electricity demand differences between the next and last 24 hours (24 outputs)  
+    - Total number of outputs: 24  
 ### Method for deployment  
 - User interface through a streamlit app  
 - API through FastAPI and Deta  
