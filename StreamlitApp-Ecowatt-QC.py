@@ -13,10 +13,62 @@ import os
 import pandas as pd
 from joblib import load
 import streamlit as st
+import sys
+import path
 
 ###############################################################################
 # FONCTIONS
 ###############################################################################
+@st.cache_resource
+def LoadModels():
+    """
+    
+
+    Returns
+    -------
+    MeanModel : TYPE
+        DESCRIPTION.
+    Model_q95 : TYPE
+        DESCRIPTION.
+    Model_q99 : TYPE
+        DESCRIPTION.
+
+    """
+    MeanModel = load('MeanModel.joblib') 
+    Model_q95 = load('Model_q95.joblib') 
+    Model_q99 = load('Model_q99.joblib') 
+    
+    return MeanModel, Model_q95, Model_q99
+
+@st.cache_data
+def LoadPreviousWeather():
+    """
+    
+
+    Returns
+    -------
+    dfPrevWeather : TYPE
+        DESCRIPTION.
+
+    """
+    dfPrevWeather = pd.DataFrame()
+    
+    return dfPrevWeather
+
+@st.cache_data
+def LoadWeatherForecast():
+    """
+    
+
+    Returns
+    -------
+    dfWeatherForecast : TYPE
+        DESCRIPTION.
+
+    """
+    dfWeatherForecast = []
+    
+    return dfWeatherForecast
 
 ###############################################################################
 # PROGRAMME PRINCIPAL
@@ -24,8 +76,10 @@ import streamlit as st
 if __name__ == "__main__":
     
     # Définir le working directory 
-    cwd = os.getcwd()
-    os.chdir(cwd)
+    # cwd = os.getcwd()
+    # os.chdir(cwd)
+    dir = path.Path(__file__).abspath()
+    sys.path.append(dir.parent.parent)
     
     # Introduction
     st.set_page_config(page_title="Ecowatt-QC", layout="wide", 
@@ -48,6 +102,13 @@ if __name__ == "__main__":
                 whether in an action of contract, tort or otherwise, arising 
                 from, out of or in connection with the software or the use or 
                 other dealings in the software.  
+                """)
+    
+    # Load models
+    MeanModel, Model_q95, Model_q99 = LoadModels()
+    
+    # Introduce the features
+    st.markdown("""
                 ## 3. Features  
                 ### 3.1. Feature 1 - Current situation on the grid  
                 By checking the box herebelow, the first feature will be 
