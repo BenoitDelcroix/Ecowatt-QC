@@ -34,9 +34,9 @@ def LoadModels():
         DESCRIPTION.
 
     """
-    MeanModel = load('MeanModel.joblib') 
-    Model_q95 = load('Model_q95.joblib') 
-    Model_q99 = load('Model_q99.joblib') 
+    MeanModel = load(r'Models/MeanModel.joblib') 
+    Model_q95 = load(r'Models/Model_q95.joblib') 
+    Model_q99 = load(r'Models/Model_q99.joblib') 
     
     return MeanModel, Model_q95, Model_q99
 
@@ -76,10 +76,8 @@ def LoadWeatherForecast():
 if __name__ == "__main__":
     
     # Définir le working directory 
-    # cwd = os.getcwd()
-    # os.chdir(cwd)
-    dir = path.Path(__file__).abspath()
-    sys.path.append(dir.parent.parent)
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    os.chdir(cwd)
     
     # Introduction
     st.set_page_config(page_title="Ecowatt-QC", layout="wide", 
