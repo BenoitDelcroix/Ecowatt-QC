@@ -13,8 +13,8 @@ import os
 import pandas as pd
 from joblib import load
 import streamlit as st
-import sys
-import path
+import workalendar
+from datetime import datetime as dt
 
 ###############################################################################
 # FONCTIONS
@@ -41,7 +41,7 @@ def LoadModels():
     return MeanModel, Model_q95, Model_q99
 
 @st.cache_data
-def LoadPreviousWeather():
+def LoadPrevWeather(year,month,day,hour):
     """
     
 
@@ -51,24 +51,88 @@ def LoadPreviousWeather():
         DESCRIPTION.
 
     """
-    dfPrevWeather = pd.DataFrame()
+    # Definitions
+    Cities = ['Montreal','Quebec','Gatineau','Sherbrooke','Saguenay',
+              'Trois-Rivieres']
+    Past24h = ['https://weather.gc.ca/past_conditions/index_e.html?station=yul',
+               'https://weather.gc.ca/past_conditions/index_e.html?station=yqb',
+               'https://weather.gc.ca/past_conditions/index_e.html?station=ynd',
+               'https://weather.gc.ca/past_conditions/index_e.html?station=ysc',
+               'https://weather.gc.ca/past_conditions/index_e.html?station=wjo',
+               'https://weather.gc.ca/past_conditions/index_e.html?station=yrq']
+    Past24h_min = []
+    Past24h_mean = []
+    Past24h_max = []
     
-    return dfPrevWeather
+    # Get data
+    for i in range(len(Past24h)):
+        df_past = pd.read_html(Past24h[i])[0][['Date / Time (EDT)',
+                                               'Temperature  (°C)']]
+        df_past = df_past[df_past['Date / Time (EDT)'] != 
+                          df_past['Temperature  (°C)']]
+        df_past[['Temperature  (°C)','other']] = df_past['Temperature  (°C)'].\
+        str.split('  ',expand=True)
+        df_past['Temperature  (°C)'] = pd.to_numeric(df_past['Temperature  (°C)'],
+                                                     errors='coerce') 
+        df_past.dropna(inplace=True)
+        
+        Past24h_min.append(df_past['Temperature  (°C)'].min())
+        Past24h_mean.append(df_past['Temperature  (°C)'].mean())
+        Past24h_max.append(df_past['Temperature  (°C)'].max())
+        
+        pass # end of loop for i in tqdm(range(len(Past24h)))
+    
+    df = pd.DataFrame(data=Past24h_min,columns=['Past24h_min'],index=Cities)
+    df['Past24h_mean'] = Past24h_mean
+    df['Past24h_max'] = Past24h_max
+    
+    return df
 
 @st.cache_data
-def LoadWeatherForecast():
+def LoadWeatherForecast(year,month,day,hour):
     """
     
 
     Returns
     -------
-    dfWeatherForecast : TYPE
+    df : TYPE
         DESCRIPTION.
 
     """
-    dfWeatherForecast = []
+    # Definitions
+    Cities = ['Montreal','Quebec','Gatineau','Sherbrooke','Saguenay',
+              'Trois-Rivieres']
+    Next24h = ['https://weather.gc.ca/forecast/hourly/qc-147_metric_e.html',
+               'https://weather.gc.ca/forecast/hourly/qc-133_metric_e.html',
+               'https://weather.gc.ca/forecast/hourly/qc-126_metric_e.html',
+               'https://weather.gc.ca/forecast/hourly/qc-136_metric_e.html',
+               'https://weather.gc.ca/forecast/hourly/qc-166_metric_e.html',
+               'https://weather.gc.ca/forecast/hourly/qc-130_metric_e.html']
+    Next24h_min = []
+    Next24h_mean = []
+    Next24h_max = []
     
-    return dfWeatherForecast
+    # Get data
+    for i in range(len(Next24h)):
+        df_future = pd.read_html(Next24h[i])[0][['Date/Time  (EDT)', 
+                                                 'Temp.  (°C)']]
+        df_future = df_future[df_future['Date/Time  (EDT)'] != 
+                              df_future['Temp.  (°C)']]
+        df_future['Temp.  (°C)'] = pd.to_numeric(df_future['Temp.  (°C)'],
+                                                 errors='coerce') 
+        df_future.dropna(inplace=True)
+        
+        Next24h_min.append(df_future['Temp.  (°C)'].min())
+        Next24h_mean.append(df_future['Temp.  (°C)'].mean())
+        Next24h_max.append(df_future['Temp.  (°C)'].max())
+        
+        pass # end of loop for i in tqdm(range(len(Past24h)))
+    
+    df = pd.DataFrame(data=Next24h_min,columns=['Next24h_min'],index=Cities)
+    df['Next24h_mean'] = Next24h_mean
+    df['Next24h_max'] = Next24h_max
+    
+    return df
 
 ###############################################################################
 # PROGRAMME PRINCIPAL
@@ -136,6 +200,19 @@ if __name__ == "__main__":
                     Section to present the forecasted situation on the network 
                     for the next 24 hours.
                     """)
+        with st.spinner('Getting weather data from the last 24 hours...'):
+            dfPrevWeather = LoadPrevWeather(dt.utcnow().year,dt.utcnow().month,
+                                            dt.utcnow().day,dt.utcnow().hour)    
+        st.success('Previous weather data obtained')
+        st.dataframe(dfPrevWeather)
+        
+        with st.spinner('Getting weather data for the next 24 hours...'):
+            dfWeatherForecast = LoadWeatherForecast(dt.utcnow().year,
+                                                    dt.utcnow().month,
+                                                    dt.utcnow().day,
+                                                    dt.utcnow().hour)
+        st.success('Weather forecast data obtained')
+        st.dataframe(dfWeatherForecast)
         
         pass # end of currentSituation
     

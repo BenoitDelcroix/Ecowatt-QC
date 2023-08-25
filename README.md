@@ -1,7 +1,10 @@
 # Ecowatt-QC
 Ecowatt made in QC  
 
-## Data    
+## Data  
+Here are all the data of interest for this project presented in bullet points 
+herebelow. To be noted: some of these data are not currently used but could be 
+in the future.     
 - Weather data (source: Meteo Canada)  
     - Montréal:  
         - Past: see folder Data  
@@ -44,7 +47,15 @@ Ecowatt made in QC
 
 ## Methods  
 ### Basic method to assess grid stress  
-- Indicator:  
+- Indicator for the current situation:  
+    - Indicator 1:  
+        - Current demand > 95% of HQ production capacity --> Red light  
+        - Current demand > 80% of HQ production capacity --> Orange light  
+        - Otherwise --> Green light  
+    - Indicator 2:  
+        - Production from thermal plant > 0 --> Red light  
+        - Otherwise --> Green light  
+- Indicator for the forecasted situations (next 24 hours):  
     - Demand estimated by the model forecasting the 95th percentile > HQ production capacity --> Red light  
     - Demand estimated by the model forecasting the 99th percentile > HQ production capacity --> Orange light  
     - Otherwise --> Green light  
