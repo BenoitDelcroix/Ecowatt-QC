@@ -48,13 +48,9 @@ in the future.
 ## Methods  
 ### Basic method to assess grid stress  
 - Indicator for the current situation:  
-    - Indicator 1:  
-        - Current demand > 95% of HQ production capacity --> Red light  
-        - Current demand > 80% of HQ production capacity --> Orange light  
-        - Otherwise --> Green light  
-    - Indicator 2:  
-        - Production from thermal plant > 0 --> Red light  
-        - Otherwise --> Green light  
+    - Current demand > 95% of HQ production capacity --> Red light  
+    - Current demand > 80% of HQ production capacity --> Orange light  
+    - Otherwise --> Green light  
 - Indicator for the forecasted situations (next 24 hours):  
     - Demand estimated by the model forecasting the 95th percentile > HQ production capacity --> Red light  
     - Demand estimated by the model forecasting the 99th percentile > HQ production capacity --> Orange light  

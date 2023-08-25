@@ -15,6 +15,10 @@ from joblib import load
 import streamlit as st
 import workalendar
 from datetime import datetime as dt
+import plotly.graph_objects as go
+import ssl
+from urllib import request
+import json
 
 ###############################################################################
 # FONCTIONS
@@ -134,6 +138,52 @@ def LoadWeatherForecast(year,month,day,hour):
     
     return df
 
+@st.cache_data
+def GetCurrentElectricityDemand(year,month,day,hour):
+    """
+    
+
+    Parameters
+    ----------
+    year : TYPE
+        DESCRIPTION.
+    month : TYPE
+        DESCRIPTION.
+    day : TYPE
+        DESCRIPTION.
+    hour : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    df : TYPE
+        DESCRIPTION.
+
+    """
+    # Definitions
+    url = 'https://www.hydroquebec.com/data/documents-donnees/'+\
+        'donnees-ouvertes/json/demande.json'
+    
+    # Get HTML data
+    context = ssl.create_default_context()
+    context.set_ciphers('AES128-SHA')
+    response = request.urlopen(url, context=context)
+    html = response.read()
+    raw = json.loads(html)
+    listDate = []
+    listValue = []
+    for i in raw['details']:
+        try:
+            listValue.append(i['valeurs']['demandeTotal'])
+            listDate.append(i['date'])
+        except:
+            break        
+        pass
+    df = pd.DataFrame(data=listDate,columns=['Date'])
+    df['Demand_MW'] = listValue
+
+    return df
+
 ###############################################################################
 # PROGRAMME PRINCIPAL
 ###############################################################################
@@ -151,10 +201,10 @@ if __name__ == "__main__":
                 ## 1. Introduction
                 Like the Écowatt website (https://www.monecowatt.fr/) developed
                 by RTE in France, this web app humbly attempts to achieve the 
-                same goal for the province of Quebec. Using open data from 
-                Hydro-Québec and Weather Canada, the app presents the current 
-                situation on the Quebec power grid, as well as a forecast for 
-                the next 24 hours.  
+                same goal for the province of Quebec (as a preliminary 
+                prototype). Using open data from Hydro-Québec and Weather 
+                Canada, the app presents the current situation on the Quebec 
+                power grid, as well as a forecast for the next 24 hours.  
                 ## 2. Disclaimer  
                 The software is provided "as is", without warranty of any kind, 
                 express or implied, including but not limited to the warranties 
@@ -169,10 +219,23 @@ if __name__ == "__main__":
     # Load models
     MeanModel, Model_q95, Model_q99 = LoadModels()
     
+    # Define the HQ production capacity to consider
+    st.markdown("""
+                ## 3. What is the HQ production capacity to consider?  
+                In 2023, the total hydroelectric capacity in Quebec is 36877 
+                MW (36.9 GW), excluding capacities from thermal plants, remote 
+                networks and other supply. By default, this value is given in 
+                the slider below. If you want to test scenarios where the 
+                capacity has a different value, do not hesitate to change that 
+                with the slider.  
+                """)
+    capacity = st.slider('What is the production capacity to consider (in GW)?', 
+                         30.0, 60.0, 36.9, 0.1)
+    
     # Introduce the features
     st.markdown("""
-                ## 3. Features  
-                ### 3.1. Feature 1 - Current situation on the grid  
+                ## 4. Features  
+                ### 4.1. Feature 1 - Current situation on the grid  
                 By checking the box herebelow, the first feature will be 
                 unlocked, presenting briefly the current situation on the 
                 network.   
@@ -184,12 +247,51 @@ if __name__ == "__main__":
         st.markdown("""
                     Section to present the current situation on the network.  
                     """)
+        with st.spinner('Getting current electricity demand data...'):
+            dfCurDemand = GetCurrentElectricityDemand(dt.utcnow().year,
+                                                      dt.utcnow().month,
+                                                      dt.utcnow().day,
+                                                      dt.utcnow().hour)    
+        st.success('Current electricity demand data obtained')
         
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown('### Time series  ')
+            st.dataframe(dfCurDemand)
+            pass
+        with col2:
+            st.markdown("""
+                        ### Visual indicator  
+                        Gauge presenting the current situation on the grid. To 
+                        be noted: the thin black line presents the production 
+                        capacity defined by the slider above.  
+                        """)
+            fig = go.Figure(go.Indicator(domain = {'x': [0, 1], 'y': [0, 1]},
+                                         value = dfCurDemand['Demand_MW'].\
+                                             values[-1]/1000,
+                                         mode = "gauge+number",
+                                         title = {'text': 'Current situation on'+\
+                                                  ' the network [GW]'},
+                                         gauge = {'axis': {'range': [None, 60]},
+                                                  'bar': {'color': "black"},
+                                                  'steps' : [{'range': [0, 0.8*capacity],
+                                                              'color': "green"},
+                                                             {'range': [0.8*capacity, 0.95*capacity],
+                                                              'color': "orange"},
+                                                             {'range': [0.95*capacity, 60],
+                                                              'color': "red"}],
+                                                  'threshold': {'line': {'color': "black", 
+                                                                         'width': 4},
+                                                                'thickness': 0.75,
+                                                                'value': capacity}}))
+            st.plotly_chart(fig)
+            pass
+    
         pass # end of currentSituation
     
     # Second section - Forecast for the next 24 hours
     st.markdown("""
-                ### 3.2. Feature 2 - Forecast for the next 24 hours  
+                ### 4.2. Feature 2 - Forecast for the next 24 hours  
                 By checking the box herebelow, the second feature will be 
                 unlocked, presenting briefly the forecasted situation on the 
                 network for the next 24 hours. 
@@ -204,15 +306,41 @@ if __name__ == "__main__":
             dfPrevWeather = LoadPrevWeather(dt.utcnow().year,dt.utcnow().month,
                                             dt.utcnow().day,dt.utcnow().hour)    
         st.success('Previous weather data obtained')
-        st.dataframe(dfPrevWeather)
-        
+                
         with st.spinner('Getting weather data for the next 24 hours...'):
             dfWeatherForecast = LoadWeatherForecast(dt.utcnow().year,
                                                     dt.utcnow().month,
                                                     dt.utcnow().day,
                                                     dt.utcnow().hour)
         st.success('Weather forecast data obtained')
-        st.dataframe(dfWeatherForecast)
+        
+        with st.spinner('Getting current electricity demand data...'):
+            dfCurDemand = GetCurrentElectricityDemand(dt.utcnow().year,
+                                                      dt.utcnow().month,
+                                                      dt.utcnow().day,
+                                                      dt.utcnow().hour)    
+        st.success('Current electricity demand data obtained')
+        dfCurDemand['Date'] = pd.to_datetime(dfCurDemand['Date'])
+        dfCurDemand.set_index('Date',inplace=True)
+        dfCurDemand = dfCurDemand.resample('H').mean()
+        
+        st.markdown("""
+                    #### Data used to estimate the future situation  
+                    """)
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.markdown('Statistics of weather conditions from the last 24 hours  ')
+            st.dataframe(dfPrevWeather)
+        with col2:
+            st.markdown('Statistics of weather conditions for the next 24 hours  ')
+            st.dataframe(dfWeatherForecast)
+        with col3:
+            st.markdown('Average hourly electricity demand for the last hours  ')
+            st.dataframe(dfCurDemand)
+            
+        st.markdown("""
+                    #### Estimations for the next 24 hours    
+                    """)
         
         pass # end of currentSituation
     
