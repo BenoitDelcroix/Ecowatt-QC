@@ -11,10 +11,12 @@ Script defining how the Streamlit app "Ecowatt-QC" works.
 ###############################################################################
 import os
 import pandas as pd
+import numpy as np
 from joblib import load
 import streamlit as st
-import workalendar
+from workalendar.america.canada import Quebec
 from datetime import datetime as dt
+from datetime import date
 import plotly.graph_objects as go
 import ssl
 from urllib import request
@@ -341,6 +343,63 @@ if __name__ == "__main__":
         st.markdown("""
                     #### Estimations for the next 24 hours    
                     """)
+        Inputs = []
+        Inputs.extend(dfPrevWeather.T.values.flatten())
+        Inputs.extend(dfWeatherForecast.T.values.flatten())
+        Inputs.append((dfCurDemand.index[-1]+pd.Timedelta(hours=1)).hour)
+        Inputs.append((dfCurDemand.index[-1]+pd.Timedelta(hours=1)).weekday())
+        
+        cal = Quebec()
+        current_day = dfCurDemand.index[-1]+pd.Timedelta(hours=1)
+        previous_day = current_day-pd.Timedelta(days=1)
+        next_day = current_day+pd.Timedelta(days=1)
+        Inputs.append(int(cal.is_working_day(date(previous_day.year, 
+                                                  previous_day.month,
+                                                  previous_day.day))))
+        Inputs.append(int(cal.is_working_day(date(current_day.year, 
+                                                  current_day.month,
+                                                  current_day.day))))
+        Inputs.append(int(cal.is_working_day(date(next_day.year, 
+                                                  next_day.month,
+                                                  next_day.day))))
+        
+        ForecastsMean = MeanModel.predict(np.array(Inputs).reshape((1,-1)))
+        Forecasts_q95 = Model_q95.predict(np.array(Inputs).reshape((1,-1)))
+        Forecasts_q99 = Model_q99.predict(np.array(Inputs).reshape((1,-1)))
+        ListDates = dfCurDemand.index[-24:]+pd.Timedelta(days=1)
+        dfEstimations = pd.DataFrame({'Date':ListDates,
+                                      'Mean':dfCurDemand['Demand_MW'].\
+                                          values[-24:]+ForecastsMean.flatten(),
+                                      'q95':dfCurDemand['Demand_MW'].\
+                                          values[-24:]+Forecasts_q95.flatten(),
+                                      'q99':dfCurDemand['Demand_MW'].\
+                                          values[-24:]+Forecasts_q99.flatten()})
+        dfEstimations['Capacity'] = capacity*1000
+        dfEstimations['StressLevel'] = 0
+        dfEstimations[dfEstimations['q99'] >= dfEstimations['Capacity']]['StressLevel'] = 1
+        dfEstimations[dfEstimations['q95'] >= dfEstimations['Capacity']]['StressLevel'] = 2
+        
+        fig2 = go.Figure()
+        fig2.add_trace(go.Scatter(x=dfEstimations['Date'],
+                                  y=dfEstimations['Mean'],
+                                  mode='lines+markers',
+                                  name='Mean forecasts'))
+        fig2.add_trace(go.Scatter(x=dfEstimations['Date'],
+                                  y=dfEstimations['q95'],
+                                  mode='lines+markers',
+                                  name='Forecasts - Q95'))
+        fig2.add_trace(go.Scatter(x=dfEstimations['Date'],
+                                  y=dfEstimations['q99'],
+                                  mode='lines+markers',
+                                  name='Forecasts - Q99'))
+        fig2.add_trace(go.Scatter(x=dfEstimations['Date'],
+                                  y=dfEstimations['Capacity'],
+                                  mode='lines+markers',
+                                  name='Production capacity'))
+        fig2.update_layout(xaxis_title='Date',
+                           yaxis_title='Average hourly power [MW]')
+        st.plotly_chart(fig2)
+        
         
         pass # end of currentSituation
     
