@@ -9,18 +9,18 @@ Script defining how the Streamlit app "Ecowatt-QC" works.
 ###############################################################################
 # LIBRAIRIES
 ###############################################################################
-import os
-import pandas as pd
-import numpy as np
-from joblib import load
-import streamlit as st
-from workalendar.america.canada import Quebec
 from datetime import datetime as dt
 from datetime import date
+from joblib import load
+import json
+import numpy as np
+import os
+import pandas as pd
 import plotly.graph_objects as go
 import ssl
+import streamlit as st
 from urllib import request
-import json
+from workalendar.america.canada import Quebec
 
 ###############################################################################
 # FONCTIONS

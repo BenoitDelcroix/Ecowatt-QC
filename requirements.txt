@@ -1,0 +1,11 @@
+datetime
+joblib 
+json
+numpy 
+os
+pandas 
+plotly 
+ssl
+streamlit==1.25.0
+urllib3 
+workalendar==17.0.0
