@@ -286,7 +286,7 @@ if __name__ == "__main__":
                                                                          'width': 4},
                                                                 'thickness': 0.75,
                                                                 'value': capacity}}))
-            st.plotly_chart(fig)
+            st.plotly_chart(fig,use_container_width=True)
             pass
     
         pass # end of currentSituation
@@ -331,10 +331,10 @@ if __name__ == "__main__":
                     """)
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.markdown('Statistics of weather conditions from the last 24 hours  ')
+            st.markdown('Statistics of temperature conditions [°C] from the last 24 hours  ')
             st.dataframe(dfPrevWeather)
         with col2:
-            st.markdown('Statistics of weather conditions for the next 24 hours  ')
+            st.markdown('Statistics of temperature conditions [°C] for the next 24 hours  ')
             st.dataframe(dfWeatherForecast)
         with col3:
             st.markdown('Average hourly electricity demand for the last hours  ')
@@ -398,7 +398,7 @@ if __name__ == "__main__":
                                   name='Production capacity'))
         fig2.update_layout(xaxis_title='Date',
                            yaxis_title='Average hourly power [MW]')
-        st.plotly_chart(fig2)
+        st.plotly_chart(fig2,use_container_width=True)
         
         
         pass # end of currentSituation

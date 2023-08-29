@@ -1,11 +1,16 @@
 # Ecowatt-QC
-Ecowatt made in QC  
+Like the Écowatt website (https://www.monecowatt.fr/) developed by RTE in 
+France, this repository humbly attempts to achieve the same goal for the 
+province of Quebec (as a preliminary prototype). Using open data from 
+Hydro-Québec and Weather Canada, the Streamlit app developed based on the
+content of this repository presents the current situation on the Quebec power 
+grid, as well as a forecast for the next 24 hours.  
 
 ## Data  
 Here are all the data of interest for this project presented in bullet points 
 herebelow. To be noted: some of these data are not currently used but could be 
 in the future.     
-- Weather data (source: Meteo Canada)  
+- Weather data (source: Weather Canada)  
     - Montréal:  
         - Past: see folder Data  
         - Last 24 hours: https://weather.gc.ca/past_conditions/index_e.html?station=yul  
@@ -60,10 +65,10 @@ in the future.
 - ML model: gradient-boosted decision trees  
 - X data:  
     - Weather: for each of the 6 cities (Montréal, Québec, Gatineau, Sherbrooke, 
-    Saguenay and Trois-rivières), 6 inputs: min, mean and max of the last and 
-    next 24 hours (36 inputs)   
+    Saguenay and Trois-rivières), 6 inputs: temperature statistics (min, mean 
+    and max) of the last and next 24 hours (36 inputs)   
     - Beginning hour number of the forecast (1 input)  
-    - Beginning number of day of the forecast (1 input)  
+    - Beginning number of weekday of the forecast (1 input)  
     - Working days (previous, current and next day - 3 inputs)  
     - Total number of inputs: 36 + 1 + 1 + 3 = 41 inputs  
 - Y data:  
@@ -71,4 +76,3 @@ in the future.
     - Total number of outputs: 24  
 ### Method for deployment  
 - User interface through a streamlit app  
-- API through FastAPI and Deta  
