@@ -5,6 +5,7 @@ province of Quebec (as a preliminary prototype). Using open data from
 Hydro-Québec and Weather Canada, the Streamlit app developed based on the
 content of this repository presents the current situation on the Quebec power 
 grid, as well as a forecast for the next 24 hours.  
+The web app is online: https://ecowatt-qc.streamlit.app/  
 
 ## Data  
 Here are all the data of interest for this project presented in bullet points 
@@ -75,4 +76,4 @@ in the future.
     - Electricity demand differences between the next and last 24 hours (24 outputs)  
     - Total number of outputs: 24  
 ### Method for deployment  
-- User interface through a streamlit app  
+- User interface through a streamlit app (https://ecowatt-qc.streamlit.app/)  
