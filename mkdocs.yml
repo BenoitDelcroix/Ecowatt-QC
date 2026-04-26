@@ -1,0 +1,14 @@
+site_name: Ecowatt-QC
+site_url: https://benoitdelcroix.github.io/Ecowatt-QC/
+repo_url: https://github.com/BenoitDelcroix/Ecowatt-QC
+repo_name: BenoitDelcroix/Ecowatt-QC
+theme:
+  name: material
+nav:
+  - Home: index.md
+  - Usage: usage.md
+  - Project Structure: structure.md
+  - API Reference: api.md
+  - Contributing: contributing.md
+plugins:
+  - search
