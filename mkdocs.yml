@@ -2,13 +2,37 @@ site_name: Ecowatt-QC
 site_url: https://benoitdelcroix.github.io/Ecowatt-QC/
 repo_url: https://github.com/BenoitDelcroix/Ecowatt-QC
 repo_name: BenoitDelcroix/Ecowatt-QC
-theme:
-  name: material
+
+docs_dir: docs
+site_dir: site
+
 nav:
   - Home: index.md
   - Usage: usage.md
   - Project Structure: structure.md
   - API Reference: api.md
   - Contributing: contributing.md
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.instant
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.superfences
+
 plugins:
   - search
