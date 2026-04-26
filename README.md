@@ -2,6 +2,8 @@
 
 Ecowatt-QC is a Streamlit web application inspired by the French Écowatt project (https://www.monecowatt.fr/), adapted for the province of Quebec. It provides real-time visualization and 24-hour forecasts of electricity demand using open data from Hydro-Québec and Weather Canada.
 
+**Preliminary documentation**: [link](https://benoitdelcroix.github.io/Ecowatt-QC/)
+
 ## Features
 
 - **Real-time visualization** of Quebec's electricity demand
