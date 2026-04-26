@@ -40,6 +40,7 @@ def LoadModels():
         DESCRIPTION.
 
     """
+    print("[DEBUG] LoadModels() appelée - chargement des modèles depuis le disque.")
     MeanModel = load(r'Models/MeanModel.joblib') 
     Model_q95 = load(r'Models/Model_q95.joblib') 
     Model_q99 = load(r'Models/Model_q99.joblib') 
@@ -108,12 +109,12 @@ def LoadWeatherForecast(year,month,day,hour):
     # Definitions
     Cities = ['Montreal','Quebec','Gatineau','Sherbrooke','Saguenay',
               'Trois-Rivieres']
-    Next24h = ['https://weather.gc.ca/forecast/hourly/qc-147_metric_e.html',
-               'https://weather.gc.ca/forecast/hourly/qc-133_metric_e.html',
-               'https://weather.gc.ca/forecast/hourly/qc-126_metric_e.html',
-               'https://weather.gc.ca/forecast/hourly/qc-136_metric_e.html',
-               'https://weather.gc.ca/forecast/hourly/qc-166_metric_e.html',
-               'https://weather.gc.ca/forecast/hourly/qc-130_metric_e.html']
+    Next24h = ['https://weather.gc.ca/en/forecast/hourly/index.html?coords=45.509,-73.554',
+               'https://weather.gc.ca/en/forecast/hourly/index.html?coords=46.814,-71.208',
+               'https://weather.gc.ca/en/forecast/hourly/index.html?coords=45.491,-75.657',
+               'https://weather.gc.ca/en/forecast/hourly/index.html?coords=45.404,-71.893',
+               'https://weather.gc.ca/en/forecast/hourly/index.html?coords=48.428,-71.062',
+               'https://weather.gc.ca/en/forecast/hourly/index.html?coords=46.343,-72.543']
     Next24h_min = []
     Next24h_mean = []
     Next24h_max = []
@@ -244,7 +245,7 @@ if __name__ == "__main__":
                 """)
     
     # First section - Current situation on the grid
-    currentSituation = st.checkbox('Current situation on the grid')
+    currentSituation = st.checkbox('Current situation on the grid', value=True)
     if currentSituation:
         st.markdown("""
                     Section to present the current situation on the network.  
@@ -298,7 +299,7 @@ if __name__ == "__main__":
                 unlocked, presenting briefly the forecasted situation on the 
                 network for the next 24 hours. 
                 """)
-    forecastSituation = st.checkbox('Forecast for the next 24 hours')
+    forecastSituation = st.checkbox('Forecast for the next 24 hours', value=True)
     if forecastSituation:
         st.markdown("""
                     Section to present the forecasted situation on the network 
@@ -324,7 +325,7 @@ if __name__ == "__main__":
         st.success('Current electricity demand data obtained')
         dfCurDemand['Date'] = pd.to_datetime(dfCurDemand['Date'])
         dfCurDemand.set_index('Date',inplace=True)
-        dfCurDemand = dfCurDemand.resample('H').mean()
+        dfCurDemand = dfCurDemand.resample('h').mean()
         
         st.markdown("""
                     #### Data used to estimate the future situation  

@@ -1,79 +1,85 @@
 # Ecowatt-QC
-Like the Écowatt website (https://www.monecowatt.fr/) developed by RTE in 
-France, this repository humbly attempts to achieve the same goal for the 
-province of Quebec (as a preliminary prototype). Using open data from 
-Hydro-Québec and Weather Canada, the Streamlit app developed based on the
-content of this repository presents the current situation on the Quebec power 
-grid, as well as a forecast for the next 24 hours.  
-The web app is online: https://ecowatt-qc.streamlit.app/  
 
-## Data  
-Here are all the data of interest for this project presented in bullet points 
-herebelow. To be noted: some of these data are not currently used but could be 
-in the future.     
-- Weather data (source: Weather Canada)  
-    - Montréal:  
-        - Past: see folder Data  
-        - Last 24 hours: https://weather.gc.ca/past_conditions/index_e.html?station=yul  
-        - Current: https://weather.gc.ca/city/pages/qc-147_metric_e.html  
-        - Forecast: https://weather.gc.ca/forecast/hourly/qc-147_metric_e.html    
-    - Québec:  
-        - Past: see folder Data  
-        - Last 24 hours: https://weather.gc.ca/past_conditions/index_e.html?station=yqb    
-        - Current: https://weather.gc.ca/city/pages/qc-133_metric_e.html  
-        - Forecast: https://weather.gc.ca/forecast/hourly/qc-133_metric_e.html      
-    - Gatineau:  
-        - Past: see folder Data  
-        - Last 24 hours: https://weather.gc.ca/past_conditions/index_e.html?station=ynd    
-        - Current: https://weather.gc.ca/city/pages/qc-126_metric_e.html  
-        - Forecast: https://weather.gc.ca/forecast/hourly/qc-126_metric_e.html      
-    - Sherbrooke:  
-        - Past: see folder Data  
-        - Last 24 hours: https://weather.gc.ca/past_conditions/index_e.html?station=ysc    
-        - Current: https://weather.gc.ca/city/pages/qc-136_metric_e.html  
-        - Forecast: https://weather.gc.ca/forecast/hourly/qc-136_metric_e.html      
-    - Saguenay:  
-        - Past: see folder Data  
-        - Last 24 hours: https://weather.gc.ca/past_conditions/index_e.html?station=wjo    
-        - Current: https://weather.gc.ca/city/pages/qc-166_metric_e.html  
-        - Forecast: https://weather.gc.ca/forecast/hourly/qc-166_metric_e.html      
-    - Trois-Rivières:  
-        - Past: see folder Data  
-        - Last 24 hours: https://weather.gc.ca/past_conditions/index_e.html?station=yrq    
-        - Current: https://weather.gc.ca/city/pages/qc-130_metric_e.html  
-        - Forecast: https://weather.gc.ca/forecast/hourly/qc-130_metric_e.html      
-- Population data (source: https://statistique.quebec.ca/fr/produit/tableau/estimation-de-la-population-du-quebec)  
-- Electricity use data (source: Hydro-Québec Open Data):  
-    - Past: see folder Data    
-    - Current: https://www.hydroquebec.com/data/documents-donnees/donnees-ouvertes/json/demande.json    
-- Electricity production data (source: Hydro-Québec Open Data):  
-    - Past: see folder Data  
-    - Current: https://www.hydroquebec.com/data/documents-donnees/donnees-ouvertes/json/production.json  
-- Hydro-Québec production capacity (source: https://www.hydroquebec.com/production/centrales.html)  
+Ecowatt-QC is a Streamlit web application inspired by the French Écowatt project (https://www.monecowatt.fr/), adapted for the province of Quebec. It provides real-time visualization and 24-hour forecasts of electricity demand using open data from Hydro-Québec and Weather Canada.
 
-## Methods  
-### Basic method to assess grid stress  
-- Indicator for the current situation:  
-    - Current demand > 95% of HQ production capacity --> Red light  
-    - Current demand > 80% of HQ production capacity --> Orange light  
-    - Otherwise --> Green light  
-- Indicator for the forecasted situations (next 24 hours):  
-    - Demand estimated by the model forecasting the 95th percentile > HQ production capacity --> Red light  
-    - Demand estimated by the model forecasting the 99th percentile > HQ production capacity --> Orange light  
-    - Otherwise --> Green light  
+## Features
 
-### Method to forecast next 24-hour electricity demand  
-- ML model: gradient-boosted decision trees  
-- X data:  
-    - Weather: for each of the 6 cities (Montréal, Québec, Gatineau, Sherbrooke, 
-    Saguenay and Trois-rivières), 6 inputs: temperature statistics (min, mean 
-    and max) of the last and next 24 hours (36 inputs)   
-    - Beginning hour number of the forecast (1 input)  
-    - Beginning number of weekday of the forecast (1 input)  
-    - Working days (previous, current and next day - 3 inputs)  
-    - Total number of inputs: 36 + 1 + 1 + 3 = 41 inputs  
-- Y data:  
-    - Electricity demand differences between the next and last 24 hours (24 outputs)  
-    - Total number of outputs: 24  
-### Method for deployment  
-- User interface through a streamlit app (https://ecowatt-qc.streamlit.app/)  
+- **Real-time visualization** of Quebec's electricity demand
+- **24-hour demand forecasts** with grid stress indicators
+- **Interactive graphs** (Plotly) and data tables
+- **Custom scenarios**: adjust production capacity to test different cases
+
+## Project Structure
+
+```
+.
+├── Data/
+│   ├── ElectricityDemand/         # Historical demand data and scripts
+│   ├── ElectricityProduction/     # Historical production data and scripts
+│   ├── HQ_ProductionCapacity/     # Hydro-Québec production capacity
+│   ├── Population/                # Demographic data
+│   └── Weather/                   # Weather data and scripts
+├── Images/                        # UI images (traffic lights, etc.)
+├── Models/                        # Saved ML models (joblib)
+├── StreamlitApp-Ecowatt-QC.py     # Main Streamlit app
+├── ModelTraining.py               # Model training script
+├── PrepareDatasetForTraining.py   # Dataset preparation script
+├── pyproject.toml                 # Python dependencies and config
+└── requirements.txt               # (optional) Alternative dependencies
+```
+
+## Installation
+
+1. **Clone the repository**
+   ```
+   git clone https://github.com/BenoitDelcroix/Ecowatt-QC.git
+   cd Ecowatt-QC
+   ```
+
+2. **Create and sync the Python environment with uv**
+   ```
+   uv venv
+   uv pip install -r pyproject.toml
+   ```
+
+3. **Run the Streamlit app**
+   ```
+   uv run streamlit run StreamlitApp-Ecowatt-QC.py
+   ```
+
+## Data Sources
+
+- **Weather**: Historical and forecast data for 6 major Quebec cities (see Data/Weather)
+- **Electricity demand and production**: Hydro-Québec open data (Data/ElectricityDemand, Data/ElectricityProduction)
+- **Population**: Statistique Québec (Data/Population)
+- **Production capacity**: Hydro-Québec (Data/HQ_ProductionCapacity)
+
+## Models
+
+The models are gradient-boosted decision trees (scikit-learn, joblib):
+- `Models/MeanModel.joblib`
+- `Models/Model_q95.joblib`
+- `Models/Model_q99.joblib`
+
+## Main dependencies
+
+- streamlit
+- pandas
+- numpy
+- scikit-learn
+- plotly
+- workalendar
+- lxml
+
+All dependencies are listed in `pyproject.toml`.
+
+## How it works
+
+- The app loads the latest data and models at startup.
+- The user can visualize the current grid status and 24-hour forecasts.
+- Grid stress is indicated by color (green, orange, red) based on demand vs. capacity.
+- Forecasts use weather, calendar, and historical demand features.
+
+## Contributing
+
+Contributions are welcome! Please open an issue or pull request.
